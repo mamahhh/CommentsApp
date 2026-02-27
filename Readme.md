@@ -29,7 +29,7 @@ cd comments-backend/
 pip install -r requirements.txt
 ```
 
-📌 Copy environment file and edit:
+Copy environment file and edit:
 
 ```sh
 cp .env.example .env
@@ -50,7 +50,7 @@ CREATE DATABASE mydb;
 GRANT ALL PRIVILEGES ON DATABASE mydb TO myuser;
 ```
 
-Create tables & import sample data:
+Create tables & import sample data (Before this, please start your psql service):
 
 ```sh
 python manage.py makemigrations
