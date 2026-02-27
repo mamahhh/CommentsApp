@@ -1,6 +1,7 @@
 # CommentsApp
 
 A full-stack comments web app using **React (JS)** frontend and **Django + PostgreSQL** backend.
+![alt text](image.png)
 
 **Architecture**:
 React → JSON → Django views → Django ORM → PostgreSQL
