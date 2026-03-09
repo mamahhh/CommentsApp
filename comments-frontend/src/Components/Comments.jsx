@@ -2,10 +2,12 @@ import { CommentsList } from "./CommentsList";
 import { useState } from "react";
 import { CommentInput } from "./CommentInput";
 import { Divider } from "@douyinfe/semi-ui";
+import { CommentSort } from "./CommentSort";
 
 export const Comments = () => {
   //
   const [isCommentIputOpen, setIsCommentInputOpen] = useState(false);
+  const [getCommentsSort, setGetCommentSort] = useState({});
   return (
     <>
       <p className="italic font-bold my-0.5">@Admin</p>
@@ -24,7 +26,8 @@ export const Comments = () => {
         <CommentInput handleInputOpen={setIsCommentInputOpen} />
       )}
       <Divider margin="12px" />
-      <CommentsList />
+      <CommentSort params={getCommentsSort} handleSetParams={setGetCommentSort}/>
+      <CommentsList param={getCommentsSort}/>
     </>
   );
 };

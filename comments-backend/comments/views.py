@@ -39,6 +39,17 @@ class CommentViewSet(ModelViewSet):
         qs = super().get_queryset()
         user_id = self.request.query_params.get("user_id")
         parent_id = self.request.query_params.get("parent_id")
+        sortBy = self.request.query_params.get("sortBy")
+        # id, date
+        if sortBy == "smallestId":
+            qs = qs.order_by("id")
+        elif sortBy == "biggestId":
+            qs = qs.order_by("-id")
+        elif sortBy == "latest":
+            qs = qs.order_by("-create_at")
+        elif sortBy == "oldest":
+            qs = qs.order_by("create_at")
+        
 
         if user_id:
             qs = qs.filter(user_id=user_id)

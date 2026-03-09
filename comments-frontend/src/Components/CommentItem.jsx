@@ -83,13 +83,6 @@ export const CommentItem = ({ item, liked }) => {
 
   return (
     <div className="flex flex-col py-2">
-      {/* author & time */}
-      <div className="flex gap-1">
-        <p className="self-baseline font-bold italic">{`@${item.author}`}</p>
-        <p className="self-baseline text-[14px] text-gray-500">
-          {formatDateTime(item.update_at)}
-        </p>
-      </div>
       {/* text */}
       {!editable && (
         <p className="leading-tight text-[18px]">

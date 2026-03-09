@@ -3,7 +3,7 @@ import { useAddComment } from "../hooks/useComments";
 import { useState } from "react";
 import { TextArea } from "@douyinfe/semi-ui";
 
-export const CommentInput = ({ handleInputOpen }) => {
+export const CommentInput = ({ handleInputOpen, parent=null }) => {
   const [text, setText] = useState("");
   const [error, setError] = useState(false);
   const [newUploadedImgs, setNewUploadedImgs] = useState([]);
@@ -18,6 +18,7 @@ export const CommentInput = ({ handleInputOpen }) => {
     createComment(
       {
         text: text,
+        parent: parent,
         medias: { image_paths: newUploadedImgs.map((f) => f.path) },
       },
       {
