@@ -8,6 +8,7 @@ from django.db import transaction, IntegrityError
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.pagination import PageNumberPagination
 
 from django.core.files.storage import default_storage
 from .models import Comments, Likes, CommentImage
@@ -17,7 +18,8 @@ from .serializer import CommentSerializer, LikesSerializer
 
 User = get_user_model()
 DEFAULT_USER_NAME = "admin"
-
+class CommentsPagination(PageNumberPagination):
+    page_size = 5
 
 # Create your views here.
 class CommentViewSet(ModelViewSet):
@@ -34,6 +36,7 @@ class CommentViewSet(ModelViewSet):
     )
     serializer_class = CommentSerializer
     permission_classes = [AllowAny]
+    pagination_class = CommentsPagination
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -70,11 +73,10 @@ class CommentViewSet(ModelViewSet):
     @transaction.atomic
     def destroy(self, request, *args, **kwargs):
         comment = Comments.objects.select_for_update().get(pk=kwargs["pk"])
-
-        Comments.objects.filter(pk=comment.pk).update(
-            is_deleted=True,
-            text=""
-        )
+        comment.related_images.all().delete()
+        comment.text = ""
+        comment.is_deleted = True
+        comment.save(update_fields=["text", "is_deleted", "update_at"])
         return Response(status=204)
 
     @transaction.atomic
@@ -84,7 +86,7 @@ class CommentViewSet(ModelViewSet):
         comment = Comments.objects.get(id=pk)
         # comment = self.get_object()
         like_qs = Likes.objects.filter(user=default_user, comment=comment)
-        if like_qs.exist():
+        if like_qs.exists():
             deleted_cnt, _ = like_qs.delete()
             Comments.objects.filter(pk=comment.pk).update(likes_cnt=F("likes_cnt") - 1)
             liked = False
