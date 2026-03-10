@@ -25,6 +25,7 @@ def reset_pg_sequence(model_cls):
             [table, pk_col],
         )
 
+
 class Command(BaseCommand):
     help = "Import JSON data and insert into database"
 
@@ -53,6 +54,9 @@ class Command(BaseCommand):
             date_str = comment.get("date")
             likes_cnt = comment.get("likes", 0)
             image = comment.get("image", "")
+            parent = comment.get("parent", "")
+            if len(parent) == 0:
+                parent = None
             remote_urls = []
             if isinstance(image, str):
                 remote_urls = [image.strip()] if len(image.strip()) else []
@@ -76,6 +80,7 @@ class Command(BaseCommand):
                     "create_at": date,
                     "update_at": date,
                     "likes_cnt": likes_cnt,
+                    "parent": parent,
                 },
             )
             # clear the legacy data
@@ -88,7 +93,7 @@ class Command(BaseCommand):
             CommentImage.objects.bulk_create(objs)
         # set comment pk to max id
         reset_pg_sequence(Comments)
-        
+
         self.stdout.write(
             self.style.SUCCESS(
                 f"Imported {len(commentsList)} comments and {len(usernameSet)} users."

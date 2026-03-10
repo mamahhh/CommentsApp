@@ -8,7 +8,7 @@ class Comments(models.Model):
     # id = models.CharField(max_length=30, primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="comments")
     # When the parent comment is deleted, set parent comment id as Null.
-    parent = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, related_name="replies")
+    parent = models.CharField(null=True)
     text = models.TextField()
     create_at = models.DateTimeField(default=timezone.now)
     update_at = models.DateTimeField(default=timezone.now)

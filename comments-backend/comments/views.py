@@ -18,8 +18,7 @@ from .serializer import CommentSerializer, LikesSerializer
 
 User = get_user_model()
 DEFAULT_USER_NAME = "admin"
-class CommentsPagination(PageNumberPagination):
-    page_size = 5
+
 
 # Create your views here.
 class CommentViewSet(ModelViewSet):
@@ -36,7 +35,6 @@ class CommentViewSet(ModelViewSet):
     )
     serializer_class = CommentSerializer
     permission_classes = [AllowAny]
-    pagination_class = CommentsPagination
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -52,7 +50,6 @@ class CommentViewSet(ModelViewSet):
             qs = qs.order_by("-create_at")
         elif sortBy == "oldest":
             qs = qs.order_by("create_at")
-        
 
         if user_id:
             qs = qs.filter(user_id=user_id)
@@ -64,6 +61,9 @@ class CommentViewSet(ModelViewSet):
                 qs = qs.filter(parent_id=parent_id)
 
         return qs
+    
+    # def get_serializer_class(self):
+    #     if self.action ==
 
     @transaction.atomic
     def perform_create(self, serializer):

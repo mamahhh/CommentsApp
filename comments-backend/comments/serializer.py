@@ -117,3 +117,4 @@ class LikesSerializer(serializers.ModelSerializer):
         model = Likes
         fields = ["user", "author", "comment", "create_at"]
         read_only_fields = ["user", "author", "create_at"]
+
