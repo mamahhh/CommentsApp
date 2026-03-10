@@ -14,6 +14,7 @@ class Comments(models.Model):
     update_at = models.DateTimeField(default=timezone.now)
     likes_cnt = models.BigIntegerField(default=0)
     image_url = models.URLField(max_length=500, default='')
+    is_deleted = models.BooleanField(default=False)
 
 class Likes(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="comments_likes")

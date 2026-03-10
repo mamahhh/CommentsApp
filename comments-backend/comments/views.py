@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 
 from django.db.models import F
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -40,7 +40,7 @@ class CommentViewSet(ModelViewSet):
         user_id = self.request.query_params.get("user_id")
         parent_id = self.request.query_params.get("parent_id")
         sortBy = self.request.query_params.get("sortBy")
-        # id, date
+        # sort by id, date
         if sortBy == "smallestId":
             qs = qs.order_by("id")
         elif sortBy == "biggestId":
@@ -67,14 +67,25 @@ class CommentViewSet(ModelViewSet):
         default_user, _ = User.objects.get_or_create(username=DEFAULT_USER_NAME)
         comment = serializer.save(user=default_user)
 
+    @transaction.atomic
+    def destroy(self, request, *args, **kwargs):
+        comment = Comments.objects.select_for_update().get(pk=kwargs["pk"])
+
+        Comments.objects.filter(pk=comment.pk).update(
+            is_deleted=True,
+            text=""
+        )
+        return Response(status=204)
+
+    @transaction.atomic
     @action(detail=True, methods=["POST"])
     def toggle_likes(self, request, pk=None):
         default_user, _ = User.objects.get_or_create(username=DEFAULT_USER_NAME)
         comment = Comments.objects.get(id=pk)
         # comment = self.get_object()
-        like_exists = Likes.objects.filter(user=default_user, comment=comment).exists()
-        if like_exists:
-            Likes.objects.filter(user=default_user, comment=comment).delete()
+        like_qs = Likes.objects.filter(user=default_user, comment=comment)
+        if like_qs.exist():
+            deleted_cnt, _ = like_qs.delete()
             Comments.objects.filter(pk=comment.pk).update(likes_cnt=F("likes_cnt") - 1)
             liked = False
         else:
